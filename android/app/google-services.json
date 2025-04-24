@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "338386092823",
+    "project_id": "project2-cefa4",
+    "storage_bucket": "project2-cefa4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338386092823:android:310d468a728ec58741ad52",
+        "android_client_info": {
+          "package_name": "com.example.project2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3102WvE_SSYikT-QppvG25ov1C-jjXpA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
