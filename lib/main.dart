@@ -40,6 +40,7 @@ class _HomePageState extends State<HomePage> {
     DashboardScreen(),
     NewsScreen(),
     WatchlistScreen(),
+    ChartsScreen(),
   ];
 
   void _onItemTapped(int index) {
