@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     NewsScreen(),
+    WatchlistScreen(),
   ];
 
   void _onItemTapped(int index) {
