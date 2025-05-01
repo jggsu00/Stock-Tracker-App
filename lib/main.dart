@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_screen.dart';
 import 'dashboard_screen.dart';
 import 'news_screen.dart';
 import 'watchlist_screen.dart';
 import 'charts_screen.dart';
-import 'settings_screen.dart';
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const StockTrackerApp());
 }
+
 
 class StockTrackerApp extends StatelessWidget {
   const StockTrackerApp({super.key});
@@ -18,13 +23,23 @@ class StockTrackerApp extends StatelessWidget {
     return MaterialApp(
       title: 'Stock Tracker',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasData) {
+            return const HomePage(); // logged in
+          } else {
+            return const LoginScreen(); // not logged in
+          }
+        },
       ),
-      home: const HomePage(),
     );
   }
 }
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -62,7 +77,6 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.article), label: 'News'),
           BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Watch'),
           BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'Charts'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
       ),
     );
