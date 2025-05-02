@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
 
@@ -11,6 +12,18 @@ class DashboardScreen extends StatelessWidget {
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),
     );
+  }
+
+
+  Future<void> _addToWatchlist(String symbol) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final docRef = FirebaseFirestore.instance.collection('watchlists').doc(uid);
+
+    await docRef.set({
+      'symbols': FieldValue.arrayUnion([symbol])
+    }, SetOptions(merge: true));
   }
 
   @override
@@ -34,9 +47,9 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(height: 20),
             const Text("STOCKS", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            _stockCard("AAPL", "\$187.88", "+0.52%"),
-            _stockCard("MSFT", "\$312.22", "-1.23%"),
-            _stockCard("TSLA", "\$723.12", "+2.01%"),
+            _stockCard(context, "AAPL", "\$187.88", "+0.52%"),
+            _stockCard(context, "MSFT", "\$312.22", "-1.23%"),
+            _stockCard(context, "TSLA", "\$723.12", "+2.01%"),
             TextButton(onPressed: () {}, child: const Text("View More"))
           ],
         ),
@@ -44,10 +57,16 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _stockCard(String symbol, String price, String change) {
+
+  Widget _stockCard(BuildContext context, String symbol, String price, String change) {
     return Card(
       child: ListTile(
         title: Text("Stock: $symbol - $price ($change)"),
+        trailing: IconButton(
+          icon: const Icon(Icons.star_border),
+          tooltip: 'Add to Watchlist',
+          onPressed: () => _addToWatchlist(symbol),
+        ),
       ),
     );
   }
