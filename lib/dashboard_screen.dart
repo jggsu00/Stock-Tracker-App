@@ -1,10 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'login_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+const String finnhubApiKey = 'd0ag111r01qm3l9l6gh0d0ag111r01qm3l9l6ghg';
+
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String? _searchedSymbol;
+  double? _searchedPrice;
+
+  final List<String> dashboardSymbols = [
+    'AAPL',
+    'MSFT',
+    'TSLA',
+    'GOOGL',
+    'AMZN',
+    'NVDA',
+    'META',
+    'NFLX',
+    'JPM',
+    'DIS',
+    'INTC',
+    'AMD',
+  ];
 
   Future<void> _signOut(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
@@ -14,16 +42,49 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-
   Future<void> _addToWatchlist(String symbol) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
     final docRef = FirebaseFirestore.instance.collection('watchlists').doc(uid);
-
     await docRef.set({
       'symbols': FieldValue.arrayUnion([symbol])
     }, SetOptions(merge: true));
+  }
+
+  Future<double?> fetchStockPrice(String symbol) async {
+    final url = Uri.parse('https://finnhub.io/api/v1/quote?symbol=$symbol&token=$finnhubApiKey');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['c']?.toDouble();
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> _searchStock() async {
+    final symbol = _searchController.text.trim().toUpperCase();
+    if (symbol.isEmpty) return;
+
+    final price = await fetchStockPrice(symbol);
+
+    if (price == null || price == 0.0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Symbol not found")),
+      );
+      setState(() {
+        _searchedSymbol = null;
+        _searchedPrice = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _searchedSymbol = symbol;
+      _searchedPrice = price;
+    });
   }
 
   @override
@@ -43,29 +104,61 @@ class DashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const TextField(decoration: InputDecoration(labelText: "Search Stock")),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(labelText: "Search Stock Symbol"),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: _searchStock,
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
-            const Text("STOCKS", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            if (_searchedSymbol != null && _searchedPrice != null)
+              Card(
+                child: ListTile(
+                  title: Text(_searchedSymbol!),
+                  subtitle: Text('\$${_searchedPrice!.toStringAsFixed(2)}'),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.star_border),
+                    onPressed: () => _addToWatchlist(_searchedSymbol!),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 20),
+            const Text("Popular Stocks", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            _stockCard(context, "AAPL", "\$187.88", "+0.52%"),
-            _stockCard(context, "MSFT", "\$312.22", "-1.23%"),
-            _stockCard(context, "TSLA", "\$723.12", "+2.01%"),
-            TextButton(onPressed: () {}, child: const Text("View More"))
+            Expanded(
+              child: ListView.builder(
+                itemCount: dashboardSymbols.length,
+                itemBuilder: (context, index) {
+                  final symbol = dashboardSymbols[index];
+                  return FutureBuilder<double?>(
+                    future: fetchStockPrice(symbol),
+                    builder: (context, snapshot) {
+                      final price = snapshot.data;
+                      return Card(
+                        child: ListTile(
+                          title: Text(symbol),
+                          subtitle: Text(price != null ? '\$${price.toStringAsFixed(2)}' : 'Loading...'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.star_border),
+                            tooltip: 'Add to Watchlist',
+                            onPressed: () => _addToWatchlist(symbol),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
           ],
-        ),
-      ),
-    );
-  }
-
-
-  Widget _stockCard(BuildContext context, String symbol, String price, String change) {
-    return Card(
-      child: ListTile(
-        title: Text("Stock: $symbol - $price ($change)"),
-        trailing: IconButton(
-          icon: const Icon(Icons.star_border),
-          tooltip: 'Add to Watchlist',
-          onPressed: () => _addToWatchlist(symbol),
         ),
       ),
     );

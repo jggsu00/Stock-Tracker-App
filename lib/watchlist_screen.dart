@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+const String finnhubApiKey = 'd0ag111r01qm3l9l6gh0d0ag111r01qm3l9l6ghg';
 
 class WatchlistScreen extends StatefulWidget {
   const WatchlistScreen({super.key});
@@ -47,6 +51,18 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
     });
   }
 
+  Future<double?> fetchStockPrice(String symbol) async {
+    final url = Uri.parse('https://finnhub.io/api/v1/quote?symbol=$symbol&token=$finnhubApiKey');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['c']?.toDouble();
+    } else {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,16 +88,28 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
             itemCount: symbols.length,
             itemBuilder: (context, index) {
               final symbol = symbols[index];
-              return ListTile(
-                leading: const Icon(Icons.star),
-                title: Text(symbol),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    await _removeFromWatchlist(symbol);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$symbol removed')));
-                  },
-                ),
+              return FutureBuilder<double?>(
+                future: fetchStockPrice(symbol),
+                builder: (context, priceSnapshot) {
+                  final price = priceSnapshot.data;
+                  return ListTile(
+                    leading: const Icon(Icons.star),
+                    title: Text(symbol),
+                    subtitle: Text(
+                      price != null ? '\$${price.toStringAsFixed(2)}' : 'Loading...',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () async {
+                        await _removeFromWatchlist(symbol);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('$symbol removed')),
+                        );
+                      },
+                    ),
+                  );
+                },
               );
             },
           );
