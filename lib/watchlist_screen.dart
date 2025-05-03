@@ -94,7 +94,16 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("WATCHLIST")),
+      backgroundColor: Colors.grey,
+      appBar: AppBar(
+        backgroundColor: Colors.grey[850],
+        foregroundColor: Colors.white,
+        title: const Text(
+          "WATCHLIST",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+
       body: FutureBuilder<List<String>>(
         future: _watchlistFuture,
         builder: (context, snapshot) {

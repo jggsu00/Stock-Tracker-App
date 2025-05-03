@@ -85,7 +85,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
                       toY: values[index],
                       width: 20,
                       borderRadius: BorderRadius.circular(8),
-                      color: Colors.indigoAccent,
+                      color: Colors.black,
                       backDrawRodData: BackgroundBarChartRodData(
                         show: true,
                         toY: maxY,
@@ -134,7 +134,15 @@ class _ChartsScreenState extends State<ChartsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("STOCK STATS")),
+      backgroundColor: Colors.grey,
+      appBar: AppBar(
+        backgroundColor: Colors.grey[850],
+        foregroundColor: Colors.white,
+        title: const Text(
+          "STOCK CHARTS",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Column(
         children: [
           Padding(
@@ -146,6 +154,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
                     controller: _symbolController,
                     decoration: const InputDecoration(
                       labelText: "Search Stock Symbol",
+                      labelStyle: TextStyle(color: Colors.black)
                     ),
                     onSubmitted: (value) {
                       if (value
@@ -157,7 +166,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.search),
+                  icon: const Icon(Icons.search, color: Colors.black,),
                   onPressed: () {
                     final symbol = _symbolController.text.trim().toUpperCase();
                     if (symbol.isNotEmpty) {

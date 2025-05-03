@@ -30,9 +30,9 @@ class StockTrackerApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasData) {
-            return const HomePage(); // logged in
+            return const HomePage();
           } else {
-            return const LoginScreen(); // not logged in
+            return const LoginScreen();
           }
         },
       ),
@@ -72,6 +72,13 @@ class _HomePageState extends State<HomePage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        backgroundColor: Colors.grey[850],
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.white,
+        selectedFontSize: 14,
+        unselectedFontSize: 12,
+        iconSize: 28,
+        elevation: 8,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dash'),
           BottomNavigationBarItem(icon: Icon(Icons.article), label: 'News'),

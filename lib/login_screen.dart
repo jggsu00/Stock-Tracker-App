@@ -30,24 +30,32 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      backgroundColor: Colors.grey,
+      appBar: AppBar(
+        backgroundColor: Colors.grey[850],
+        foregroundColor: Colors.white,
+        title: const Text(
+          "LOGIN",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(controller: _email, decoration: const InputDecoration(labelText: 'Email')),
+            TextField(controller: _email, decoration: const InputDecoration(labelText: 'Email', labelStyle: TextStyle(color: Colors.black))),
             TextField(
               controller: _password,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Password', labelStyle: TextStyle(color: Colors.black)),
               obscureText: true,
             ),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: _login, child: const Text('Login')),
+            ElevatedButton(onPressed: _login, child: const Text('Login', style: TextStyle(color: Colors.black),)),
             TextButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen()));
               },
-              child: const Text("Don't have an account? Register"),
+              child: const Text("Don't have an account? Register", style: TextStyle(color: Colors.black),),
             )
           ],
         ),

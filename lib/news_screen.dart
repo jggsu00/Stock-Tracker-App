@@ -65,7 +65,15 @@ class _NewsScreenState extends State<NewsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("MARKET NEWS")),
+      backgroundColor: Colors.grey,
+      appBar: AppBar(
+        backgroundColor: Colors.grey[850],
+        foregroundColor: Colors.white,
+        title: const Text(
+          "MARKET NEWS",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Column(
         children: [
           Padding(
@@ -77,11 +85,12 @@ class _NewsScreenState extends State<NewsScreen> {
                     controller: _symbolController,
                     decoration: const InputDecoration(
                       labelText: "Search Stock Symbol",
+                      labelStyle: TextStyle(color: Colors.black)
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.search),
+                  icon: const Icon(Icons.search, color: Colors.black,),
                   onPressed: _searchNews,
                 ),
               ],

@@ -90,11 +90,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey,
       appBar: AppBar(
-        title: const Text("STOCK DASHBOARD"),
+        backgroundColor: Colors.grey[850],
+        foregroundColor: Colors.white,
+        title: const Text(
+          "STOCK DASHBOARD",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white,),
             tooltip: 'Sign Out',
             onPressed: () => _signOut(context),
           ),
@@ -109,11 +115,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: TextField(
                     controller: _searchController,
-                    decoration: const InputDecoration(labelText: "Search Stock Symbol"),
+                    decoration: const InputDecoration(labelText: "Search Stock Symbol", labelStyle: TextStyle(color: Colors.black)),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.search),
+                  icon: const Icon(Icons.search, color: Colors.black,),
                   onPressed: _searchStock,
                 ),
               ],
